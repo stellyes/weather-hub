@@ -50,3 +50,19 @@ nav {
 .conditions-icon {
   width: 75%;
 }
+
+#credits {
+  font-size: x-small;
+
+  color: #083177;
+}
+
+#credits a {
+  text-decoration: none;
+  color: #083177;
+  transition: font-size 0.3s ease;
+}
+
+#credits a:hover {
+  font-size: small;
+}
