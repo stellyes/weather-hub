@@ -50,12 +50,27 @@ function addSearchQuery(array, query) {
 }
 
 function fillSearchHistory(array) {
-  for (var i = 0; i < array.length; i++) {
-    let previousSearchBtn = `<button type="button" id="search-item" class="btn btn-secondary" style="width: 90%">${array[i]}</button>`;
-    let previousSearchLi = `<li id="previous-search-${
-      i + 1
-    }" class="my-2">${previousSearchBtn}</li>`; // Sets ID to "previous-search-#"
-    searchHistory.append(previousSearchLi);
+  let noResults = $(".no-history");
+
+  // Prompt user to make a search if nothing is in the search history
+  if (array.length !== 0) {
+    // Hide noResults element
+    noResults.css("display", "none");
+
+    // Empty existing elements from parent ul
+    searchHistory.empty();
+
+    // If array has values, fill search history box with buttons of prior searches
+    for (var i = 0; i < array.length; i++) {
+      let previousSearchBtn = `<button type="button" id="search-item" class="btn btn-secondary" style="width: 90%">${array[i]}</button>`;
+      let previousSearchLi = `<li id="previous-search-${
+        i + 1
+      }" class="my-2">${previousSearchBtn}</li>`; // Sets ID to "previous-search-#"
+      searchHistory.append(previousSearchLi);
+    }
+  } else {
+    // Show filler if no elements present
+    noResults.css("display", " ");
   }
 }
 
@@ -81,8 +96,9 @@ $(function () {
     let cityQuery = $("#get-city").val(); // Get value from search box
     let city = cityQuery.split(", "); // Split values by comma for API call
 
-    tempArray = addSearchQuery(tempArray, cityQuery);
-    fillSearchHistory(tempArray);
+    tempArray = addSearchQuery(tempArray, cityQuery); // Adds saerch query to array
+    fillSearchHistory(tempArray); // Fills in recent searches
+    storeSearches(tempArray); // Stores new data in localStorage
   });
 
   // When user clicks on recent search
