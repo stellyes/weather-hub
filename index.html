@@ -19,6 +19,12 @@
     />
     <link rel="stylesheet" href="./assets/css/style.css" />
     <title>Weather Hub!</title>
+    <!--jQuery CDN-->
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.js"
+      integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+      crossorigin="anonymous"
+    ></script>
   </head>
 
   <body>
@@ -47,19 +53,27 @@
             <input
               type="text"
               class="form-control"
-              id="getCity"
+              id="get-city"
               placeholder="Enter city here"
               required
             />
+            <button
+              type="button"
+              id="btn-search"
+              class="btn btn-secondary btn-sm btn-block mt-2"
+              style="width: 100%"
+            >
+              Search
+            </button>
           </div>
-          <ul class="my-3 py-3 px-1 text-center search-history">
-            <li class="my-2 py-2">Where search history is gna go!</li>
-            <li class="my-2 py-2">Each list item is</li>
-            <li class="my-2 py-2">going to be dynamically</li>
-            <li class="my-2 py-2">generated so that</li>
-            <li class="my-2 py-2">history doesn't repeat</li>
-            <li class="my-2 py-2">itself! lol</li>
-          </ul>
+          <div class="alert alert-danger" role="alert" style="display: none">
+            Search parameters invalid. Please use the format "City, State,
+            Country"
+          </div>
+          <ul
+            class="my-3 py-3 px-1 text-center search-history"
+            style="min-height: 10rem"
+          ></ul>
         </div>
         <div class="col-9 my-3 display-results">
           <div class="row current-conditions">
@@ -110,5 +124,6 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
+    <script src="./assets/js/script.js"></script>
   </body>
 </html>
