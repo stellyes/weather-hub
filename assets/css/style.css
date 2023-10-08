@@ -27,10 +27,23 @@ nav {
   border-radius: 20px;
 }
 
+#btn-search {
+  font-size: small;
+}
+
 .search-history {
   list-style: none;
   background-color: rgba(204, 231, 255, 0.4);
   border-radius: 20px;
+}
+
+.previous-search {
+  z-index: 1;
+}
+
+#invalid-input {
+  display: none;
+  font-size: x-small;
 }
 
 .navbar-brand {

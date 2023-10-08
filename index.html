@@ -66,10 +66,6 @@
               Search
             </button>
           </div>
-          <div class="alert alert-danger" role="alert" style="display: none">
-            Search parameters invalid. Please use the format "City, State,
-            Country"
-          </div>
           <ul
             class="my-3 py-3 px-1 text-center search-history"
             style="min-height: 10rem"
@@ -78,6 +74,20 @@
               Make a search and it'll appear here!
             </div>
           </ul>
+          <div id="units-display" class="my-3 mx-2 unit-form-check form-switch">
+            <input
+              class="mx-2 form-check-input"
+              type="checkbox"
+              id="unit-switch"
+            />
+            <label
+              id="units"
+              data-units="imperial"
+              class="mx-2 form-check-label"
+              for="unit-switch"
+              >Imperial Units</label
+            >
+          </div>
         </div>
         <div class="col-9 my-3 display-results">
           <div class="row current-conditions">
@@ -85,7 +95,7 @@
               <h1 class="current-city my-2 mx-3">Current City</h1>
               <p class="current-humidity mx-4">current humidity</p>
               <p class="current-wind mx-4">current wind speed</p>
-              <p class="current-air mx-4">current air quality</p>
+              <p class="current-clouds mx-4">current cloudiness</p>
             </div>
             <div class="col-3 justify-items-center conditions-view">
               <img
@@ -128,6 +138,6 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
-    <script src="./assets/js/script.js"></script>
+    <script type="module" src="./assets/js/script.js"></script>
   </body>
 </html>
