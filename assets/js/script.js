@@ -19,6 +19,7 @@ const displayHumidity = $(".current-humidity");
 const displayWind = $(".current-wind");
 const displayTemp = $(".current-temperature");
 const displayConditions = $(".current-conditions");
+const displayIcon = $(".conditions-icon");
 
 const conditionList = [
   "Thunderstorm",
@@ -64,6 +65,29 @@ function initializeLocalStorage() {
   };
   let initObjToString = JSON.stringify(initialObject);
   localStorage.setItem("recent-searches", initObjToString);
+}
+
+function convertUnits() {
+  if (units == "imperial") {
+    // Get number val from screen, multiply by mph/kph conversion rate, render
+    let mphToKph = displayWind.text().replace(" mph", "");
+    mphToKph = parseFloat(mphToKph * 1.609344).toPrecision(3);
+    displayWind.text(`${mphToKph} kph`);
+
+    // Get temp from screen, convert using foormula, render
+    let farToCel = displayTemp.text().replace("°F", "");
+    farToCel = parseFloat((farToCel - 32) * (5 / 9)).toPrecision(4);
+    displayTemp.text(`${farToCel}°C`);
+  } else {
+    // Same process as above in reverse
+    let kphToMph = displayWind.text().replace(" kph", "");
+    kphToMph = parseFloat(kphToMph / 1.609344).toPrecision(3);
+    displayWind.text(`${kphToMph} mph`);
+
+    let celToFar = displayTemp.text().replace("°C", "");
+    celToFar = parseFloat(celToFar * (5 / 9) + 32).toPrecision(4);
+    displayTemp.text(`${celToFar}°F`);
+  }
 }
 
 // Uses radix algorithm to sort data in conditions array
@@ -119,8 +143,8 @@ function addSearchQuery(array, query) {
       array.pop();
     }
     array.unshift(query);
-    return array;
   }
+  return array;
 }
 
 // Displays error message passed into function
@@ -232,7 +256,18 @@ function parseInputFiveDay(searchInput) {
 
 // Fills current weather conditions
 function fillCurrentForecast(data) {
-  console.log(data);
+  displayCity.text(data.name);
+  displayHumidity.text(`${data.main.humidity}%`);
+  displayWind.text(`${data.wind.speed} mph`);
+  displayTemp.text(`${data.main.temp}°F`);
+  let description = data.weather[0].description;
+  description =
+    description[0].toUpperCase() + description.slice(-description.length + 1);
+  displayConditions.text(`${description}`);
+  displayIcon.attr(
+    "src",
+    `http://openweathermap.org/img/w/${data.weather[0].icon}.png`
+  );
 }
 
 // Fills five day forecast cards
@@ -302,7 +337,6 @@ $(function () {
           // Fill in forecast data if 200 response
           if (responseCodeFiveDay == 200) {
             fillFiveForecast(data); // Fills five day forecast data
-            callFlag[0] = true;
 
             // Display error message if 404 response
           } else if (responseCodeFiveDay == 404) {
@@ -313,37 +347,34 @@ $(function () {
         })
         .then(function (data) {
           // make API call for current conditions
-          let apiCallCurrent = `https://api.openweathermap.org/data/2.5/weather?id=${data}&appid=${apikey}`;
+          let apiCallCurrent = `https://api.openweathermap.org/data/2.5/weather?id=${data}&units=${units}&appid=${apikey}`;
 
           fetch(apiCallCurrent, { cache: "reload" })
             .then(function (response) {
               return response.json();
             })
-            .then(function (moreData) {
-              var responseCodeCurrent = moreData.cod;
+            .then(function (innerData) {
+              var responseCodeCurrent = innerData.cod;
 
               if (responseCodeCurrent === 200) {
-                fillCurrentForecast(moreData);
-                callFlag[1] = true;
+                fillCurrentForecast(innerData);
               } else if (responseCodeCurrent == 404) {
                 searchError("Unable to locate city");
               }
             });
 
           // If both API calls were succesful, render search to history
-          if (callFlag == [true, true]) {
-            // Add search query to history if location is validated
-            tempArray = addSearchQuery(tempArray, cityQuery); // Adds saerch query to array
-            fillSearchHistory(tempArray); // Fills in recent searches
-            storeSearches(tempArray); // Stores new data in localStorage
+          // Add search query to history if location is validated
+          tempArray = addSearchQuery(tempArray, cityQuery); // Adds saerch query to array
+          fillSearchHistory(tempArray); // Fills in recent searches
+          storeSearches(tempArray); // Stores new data in localStorage
 
-            // Displays forecast if it's hidden
-            if ($("#inactive-display")) {
-              displayDefault.css("display", "none");
-              $("#inactive-conditions").removeClass("inactive");
-              $("#inactive-weather-img").removeClass("inactive");
-              $("#inactive-five-day").removeClass("inactive");
-            }
+          // Displays forecast if it's hidden
+          if ($("#inactive-display")) {
+            displayDefault.css("display", "none");
+            $("#inactive-conditions").removeClass("inactive");
+            $("#inactive-weather-img").removeClass("inactive");
+            $("#inactive-five-day").removeClass("inactive");
           }
         });
     }
@@ -353,16 +384,18 @@ $(function () {
     if (unitDisplay.text() == "Metric Units") {
       unitDisplay.attr("data-units", "imperial");
       unitDisplay.text("Imperial Units");
+      convertUnits();
       units = "imperial";
     } else {
       unitDisplay.attr("data-units", "metric");
       unitDisplay.text("Metric Units");
+      convertUnits();
       units = "metric";
     }
   });
 
   // Isn't registering clicks?
   searchItem.on("click", function (event) {
-    console.log(event);
+    console.log("hey");
   });
 });
