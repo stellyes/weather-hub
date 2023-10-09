@@ -31,6 +31,10 @@ nav {
   font-size: small;
 }
 
+.current-conditions {
+  font-style: italic;
+}
+
 .search-history {
   list-style: none;
   background-color: rgba(204, 231, 255, 0.4);
@@ -65,8 +69,18 @@ nav {
   display: none;
 }
 
+.card {
+  color: #083177;
+  background-color: #eeddce;
+  border: 1px solid #00000000;
+  box-shadow: 4px 4px 8px #0e53c9;
+  border-radius: 10px;
+}
+
+#wind,
+#humidity,
 #temp {
-  font-size: large;
+  font-size: 14px;
 }
 
 #condition-icon {
@@ -83,7 +97,6 @@ nav {
 
 #credits {
   font-size: x-small;
-
   color: #083177;
 }
 

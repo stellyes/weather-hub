@@ -14,6 +14,7 @@ const countryList = countries.objects;
 var units = "imperial";
 
 const displayDefault = $(".default-view");
+const conditionsSidebar = $(".conditions-view");
 const displayCity = $(".current-city");
 const displayHumidity = $(".current-humidity");
 const displayWind = $(".current-wind");
@@ -70,23 +71,70 @@ function initializeLocalStorage() {
 function convertUnits() {
   if (units == "imperial") {
     // Get number val from screen, multiply by mph/kph conversion rate, render
-    let mphToKph = displayWind.text().replace(" mph", "");
+    let mphToKph = displayWind
+      .text()
+      .replace(" mph", "")
+      .replace("Current Wind Speed: ", "");
     mphToKph = parseFloat(mphToKph * 1.609344).toPrecision(3);
-    displayWind.text(`${mphToKph} kph`);
+    displayWind.text(`Current Wind Speed: ${mphToKph} kph`);
 
     // Get temp from screen, convert using foormula, render
-    let farToCel = displayTemp.text().replace("°F", "");
+    let farToCel = displayTemp
+      .text()
+      .replace("°F", "")
+      .replace("Current Temperature: ", "");
     farToCel = parseFloat((farToCel - 32) * (5 / 9)).toPrecision(4);
-    displayTemp.text(`${farToCel}°C`);
+    displayTemp.text(`Current Temperature: ${farToCel}°C`);
+
+    // Changes wind speed and temp for each day in five day forecast
+    for (let i = 0; i < 5; i++) {
+      // Temperature
+      let farToCelTemp = $(`#day${i + 1} .card-body #temp`)
+        .text()
+        .replace("°F", "")
+        .replace("Temp: ", "");
+      farToCelTemp = Math.round((farToCelTemp - 32) * (5 / 9));
+      $(`#day${i + 1} .card-body #temp`).text(`Temp: ${farToCelTemp}°C`);
+
+      // Wind speed
+      let mphToKphTemp = $(`#day${i + 1} .card-body #wind`)
+        .text()
+        .replace(" mph", "")
+        .replace("Wind: ", "");
+      mphToKphTemp = Math.round(mphToKphTemp * 1.609344);
+      $(`#day${i + 1} .card-body #wind`).text(`Wind: ${mphToKphTemp} kph`);
+    }
   } else {
     // Same process as above in reverse
-    let kphToMph = displayWind.text().replace(" kph", "");
+    let kphToMph = displayWind
+      .text()
+      .replace(" kph", "")
+      .replace("Current Wind Speed: ", "");
     kphToMph = parseFloat(kphToMph / 1.609344).toPrecision(3);
-    displayWind.text(`${kphToMph} mph`);
+    displayWind.text(`Current Wind Speed: ${kphToMph} mph`);
 
-    let celToFar = displayTemp.text().replace("°C", "");
-    celToFar = parseFloat(celToFar * (5 / 9) + 32).toPrecision(4);
-    displayTemp.text(`${celToFar}°F`);
+    let celToFar = displayTemp
+      .text()
+      .replace("°C", "")
+      .replace("Current Temperature: ", "");
+    celToFar = parseFloat(celToFar * (9 / 5) + 32).toPrecision(4);
+    displayTemp.text(`Current Temperature: ${celToFar}°F`);
+
+    for (let i = 0; i < 5; i++) {
+      let celToFarTemp = $(`#day${i + 1} .card-body #temp`)
+        .text()
+        .replace("°C", "")
+        .replace("Temp: ", "");
+      celToFarTemp = Math.round(celToFarTemp * (9 / 5) + 32);
+      $(`#day${i + 1} .card-body #temp`).text(`Temp: ${celToFarTemp}°F`);
+
+      let kphToMphTemp = $(`#day${i + 1} .card-body #wind`)
+        .text()
+        .replace(" kph", "")
+        .replace("Wind: ", "");
+      kphToMphTemp = Math.round(kphToMphTemp / 1.609344);
+      $(`#day${i + 1} .card-body #wind`).text(`Wind: ${kphToMphTemp} mph`);
+    }
   }
 }
 
@@ -257,9 +305,15 @@ function parseInputFiveDay(searchInput) {
 // Fills current weather conditions
 function fillCurrentForecast(data) {
   displayCity.text(data.name);
-  displayHumidity.text(`${data.main.humidity}%`);
-  displayWind.text(`${data.wind.speed} mph`);
-  displayTemp.text(`${data.main.temp}°F`);
+  displayHumidity.text(`${data.main.humidity}% Humidity`);
+
+  if (units == "imperial") {
+    displayTemp.text(`Current Temperature: ${data.main.temp}°F`);
+    displayWind.text(`Current Wind Speed: ${data.wind.speed} mph`);
+  } else {
+    displayTemp.text(`Current Temperature: ${data.main.temp}°C`);
+    displayWind.text(`Current Wind Speed: ${data.wind.speed} kph`);
+  }
   let description = data.weather[0].description;
   description =
     description[0].toUpperCase() + description.slice(-description.length + 1);
@@ -268,16 +322,20 @@ function fillCurrentForecast(data) {
     "src",
     `http://openweathermap.org/img/w/${data.weather[0].icon}.png`
   );
+  conditionsSidebar.removeClass("inactive");
 }
 
 // Fills five day forecast cards
 function fillFiveForecast(data) {
   // Gets forecast in 3hr intervals for five days
   let forecastData = data.list;
+  console.log(forecastData);
   for (let i = 0; i < 5; i++) {
     // tempAvg to store average temp reading for 3hr intervals
     // conditionAvg used to return most common condition reading
     let tempAvg = 0;
+    let humAvg = 0;
+    let windAvg = 0;
     let conditionAvg = "";
     let conditionAvgList = [];
     let dataDate = forecastData[i * 8].dt_txt.split(" ");
@@ -286,22 +344,39 @@ function fillFiveForecast(data) {
     // Day 1 = 0-7, Day 2 = 8-15, and so on
     for (let j = i * 8; j < i * 8 + 8; j++) {
       tempAvg += forecastData[j].main.temp;
+      humAvg += forecastData[j].main.humidity;
+      windAvg += forecastData[j].wind.speed;
       conditionAvgList.push(forecastData[j].weather[0].main);
     }
 
     // Calculate average conditions for that day
     tempAvg = Math.floor(tempAvg / 8);
+    humAvg = Math.floor(humAvg / 8);
+    windAvg = Math.floor(windAvg / 8);
     conditionAvg = radixSortConditions(conditionAvgList);
     let imgCodeIndex = conditionList.indexOf(conditionAvg);
     let imgCode = conditionIcons[imgCodeIndex];
     let conditionImg = `http://openweathermap.org/img/w/${imgCode}.png`;
     // Fill HTML elements with corresponding data
     $(`#day${i + 1} .card-header`).text(currDate);
-    $(`#day${i + 1} .card-body #temp`).text(tempAvg + "°F");
+    if (units == "imperial") {
+      $(`#day${i + 1} .card-body #temp`).text("Temp: " + tempAvg + "°F");
+      $(`#day${i + 1} .card-body #wind`).text("Wind: " + windAvg + " mph");
+    } else {
+      $(`#day${i + 1} .card-body #temp`).text("Temp: " + tempAvg + "°C");
+      $(`#day${i + 1} .card-body #wind`).text("Wind: " + windAvg + " kph");
+    }
+    $(`#day${i + 1} .card-body #humidity`).text("Hum: " + humAvg + "%");
     $(`#day${i + 1} .card-body #condition-icon`).attr("src", conditionImg);
+    $(`#day${i + 1} .card-body #condition-icon`).attr(
+      "alt",
+      `${conditionAvg} conditions for ${currDate}`
+    );
     $(`#day${i + 1} .card-body #condition`).text(conditionAvg);
   }
 }
+
+function handleSearch(query) {}
 
 $(function () {
   // Try to get localStorage "recent-searches" item
@@ -360,6 +435,7 @@ $(function () {
                 fillCurrentForecast(innerData);
               } else if (responseCodeCurrent == 404) {
                 searchError("Unable to locate city");
+                return;
               }
             });
 
@@ -395,7 +471,8 @@ $(function () {
   });
 
   // Isn't registering clicks?
-  searchItem.on("click", function (event) {
-    console.log("hey");
+  $(".previous-search").on("click", function (event) {
+    let query = $(this).find("button").text();
+    // SEND QUERY TO SEARCH BOX, MAKE API CALL
   });
 });
