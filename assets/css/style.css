@@ -61,8 +61,17 @@ nav {
   width: 75%;
 }
 
-#inactive-display {
+.inactive {
   display: none;
+}
+
+#temp {
+  font-size: large;
+}
+
+#condition-icon {
+  width: 80px;
+  height: 80px;
 }
 
 .default-view {

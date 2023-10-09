@@ -92,15 +92,15 @@
         <div class="col-9 my-3 display-results">
           <div class="row conditions-display">
             <div class="default-view">No weather information to display!</div>
-            <div id="inactive-display" class="col-9">
+            <div id="inactive-conditions" class="col-9 inactive">
               <h1 class="current-city my-2 mx-3">Current City</h1>
               <p class="current-temperature mx-4">current temp</p>
               <p class="current-humidity mx-4">current humidity</p>
               <p class="current-wind mx-4">current wind speed</p>
             </div>
             <div
-              id="inactive-display"
-              class="col-3 justify-items-center conditions-view"
+              id="inactive-weather-img"
+              class="inactive col-3 justify-items-center conditions-view"
             >
               <img
                 class="conditions-icon mx-4"
@@ -112,11 +112,14 @@
               </p>
             </div>
           </div>
-          <div id="inactive-display" class="row justify-items-center my-3">
+          <div
+            id="inactive-five-day"
+            class="inactive row justify-items-center my-3"
+          >
             <div id="day1" class="col card mx-1 text-center">
               <h4 class="card-header"></h4>
               <div class="card-body">
-                <p id="temp"></p>
+                <h6 id="temp"></h6>
                 <img id="condition-icon" />
                 <p id="condition"></p>
               </div>
@@ -124,7 +127,7 @@
             <div id="day2" class="col card mx-1 text-center">
               <h4 class="card-header"></h4>
               <div class="card-body">
-                <p id="temp"></p>
+                <h6 id="temp"></h6>
                 <img id="condition-icon" />
                 <p id="condition"></p>
               </div>
@@ -132,7 +135,7 @@
             <div id="day3" class="col card mx-1 text-center">
               <h4 class="card-header"></h4>
               <div class="card-body">
-                <p id="temp"></p>
+                <h6 id="temp"></h6>
                 <img id="condition-icon" />
                 <p id="condition"></p>
               </div>
@@ -140,15 +143,15 @@
             <div id="day4" class="col card mx-1 text-center">
               <h4 class="card-header"></h4>
               <div class="card-body">
-                <p id="temp"></p>
-                <img id="condition-icon" style="width: 80px; height: 80px" />
+                <h6 id="temp"></h6>
+                <img id="condition-icon" />
                 <p id="condition"></p>
               </div>
             </div>
             <div id="day5" class="col card mx-1 text-center">
               <h4 class="card-header"></h4>
               <div class="card-body">
-                <p id="temp"></p>
+                <h6 id="temp"></h6>
                 <img id="condition-icon" />
                 <p id="condition"></p>
               </div>

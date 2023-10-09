@@ -160,7 +160,8 @@ function fillSearchHistory(array) {
 
 // Function takes input string searchInput and parses
 // city name, state codes, and country codes
-function parseInput(searchInput) {
+// for five day forecast
+function parseInputFiveDay(searchInput) {
   searchInput = searchInput.split(", "); // Split values by comma for API call
 
   // Inialize empty variables for testing
@@ -169,11 +170,7 @@ function parseInput(searchInput) {
   let country = "";
   let validState = false;
   let validCountry = false;
-  // ADD TWO API CALLS, ONE FOR CURRENT ONE FIVE DAY
-  let currentConditions = "";
-  let fiveDay = "";
 
-  console.log(searchInput);
   if (searchInput.length === 3) {
     city = searchInput[0];
     state = searchInput[1];
@@ -233,7 +230,12 @@ function parseInput(searchInput) {
   return 'Use "City, State, Country" format';
 }
 
-// Fills current weather and five day forecast cards
+// Fills current weather conditions
+function fillCurrentForecast(data) {
+  console.log(data);
+}
+
+// Fills five day forecast cards
 function fillFiveForecast(data) {
   // Gets forecast in 3hr intervals for five days
   let forecastData = data.list;
@@ -253,7 +255,7 @@ function fillFiveForecast(data) {
     }
 
     // Calculate average conditions for that day
-    tempAvg = Math.floor(tempAvg / 5);
+    tempAvg = Math.floor(tempAvg / 8);
     conditionAvg = radixSortConditions(conditionAvgList);
     let imgCodeIndex = conditionList.indexOf(conditionAvg);
     let imgCode = conditionIcons[imgCodeIndex];
@@ -280,7 +282,8 @@ $(function () {
   // When user searches for city
   citySearch.on("click", function () {
     let cityQuery = $("#get-city").val(); // Get value from search box
-    let apiCallFiveDay = parseInput(cityQuery);
+    let apiCallFiveDay = parseInputFiveDay(cityQuery);
+    var callFlag = [false, false]; // Boolean Flags
 
     // Since all error messages don't begin with
     // an "h", we can check if returned apiCall
@@ -294,27 +297,55 @@ $(function () {
         })
         .then(function (data) {
           // Get response code
-          let responseCode = data.cod;
+          var responseCodeFiveDay = data.cod;
 
           // Fill in forecast data if 200 response
-          if (responseCode == 200) {
+          if (responseCodeFiveDay == 200) {
             fillFiveForecast(data); // Fills five day forecast data
+            callFlag[0] = true;
 
+            // Display error message if 404 response
+          } else if (responseCodeFiveDay == 404) {
+            searchError("Unable to locate city");
+          }
+
+          return data.city.id;
+        })
+        .then(function (data) {
+          // make API call for current conditions
+          let apiCallCurrent = `https://api.openweathermap.org/data/2.5/weather?id=${data}&appid=${apikey}`;
+
+          fetch(apiCallCurrent, { cache: "reload" })
+            .then(function (response) {
+              return response.json();
+            })
+            .then(function (moreData) {
+              var responseCodeCurrent = moreData.cod;
+
+              if (responseCodeCurrent === 200) {
+                fillCurrentForecast(moreData);
+                callFlag[1] = true;
+              } else if (responseCodeCurrent == 404) {
+                searchError("Unable to locate city");
+              }
+            });
+
+          // If both API calls were succesful, render search to history
+          if (callFlag == [true, true]) {
             // Add search query to history if location is validated
             tempArray = addSearchQuery(tempArray, cityQuery); // Adds saerch query to array
             fillSearchHistory(tempArray); // Fills in recent searches
             storeSearches(tempArray); // Stores new data in localStorage
-            // Display error message if 404 response
-          } else if (responseCode == 404) {
-            searchError("Unable to locate city");
-          }
-          console.log(data);
-        });
-    }
 
-    // Displays five day forecast if it's hidden
-    if ($("#inactive-display")) {
-      $("#inactive-display").css("display", " ");
+            // Displays forecast if it's hidden
+            if ($("#inactive-display")) {
+              displayDefault.css("display", "none");
+              $("#inactive-conditions").removeClass("inactive");
+              $("#inactive-weather-img").removeClass("inactive");
+              $("#inactive-five-day").removeClass("inactive");
+            }
+          }
+        });
     }
   });
 
