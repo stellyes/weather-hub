@@ -50,19 +50,26 @@ nav {
   letter-spacing: 0.1rem;
 }
 
-.current-conditions {
+.conditions-display {
   background-color: #cce7ff;
   border: 1px solid rgba(0, 0, 0, 0);
   border-radius: 20px;
   box-shadow: 0px 0px 10px #0e53c9;
 }
 
-.conditions-view {
-  background-color: radial-gradient(to top, #1786ee 4%, #cce7ff 60%);
-}
-
 .conditions-icon {
   width: 75%;
+}
+
+#inactive-display {
+  display: none;
+}
+
+.default-view {
+  font-style: italic;
+  font-size: x-large;
+  min-height: 100%;
+  margin: 25%;
 }
 
 #credits {

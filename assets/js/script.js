@@ -13,11 +13,48 @@ const stateList = states.objects;
 const countryList = countries.objects;
 var units = "imperial";
 
+const displayDefault = $(".default-view");
 const displayCity = $(".current-city");
 const displayHumidity = $(".current-humidity");
 const displayWind = $(".current-wind");
-const displayClouds = $(".current-clouds");
 const displayTemp = $(".current-temperature");
+const displayConditions = $(".current-conditions");
+
+const conditionList = [
+  "Thunderstorm",
+  "Drizzle",
+  "Rain",
+  "Snow",
+  "Mist",
+  "Smoke",
+  "Haze",
+  "Dust",
+  "Fog",
+  "Sand",
+  "Ash",
+  "Squall",
+  "Tornado",
+  "Clear",
+  "Clouds",
+];
+
+const conditionIcons = [
+  "11d",
+  "09d",
+  "10d",
+  "13d",
+  "50d",
+  "50d",
+  "50d",
+  "50d",
+  "50d",
+  "50d",
+  "50d",
+  "50d",
+  "50d",
+  "01d",
+  "03d",
+];
 
 function initializeLocalStorage() {
   // Create initial JSON object, convert to string before
@@ -27,6 +64,33 @@ function initializeLocalStorage() {
   };
   let initObjToString = JSON.stringify(initialObject);
   localStorage.setItem("recent-searches", initObjToString);
+}
+
+// Uses radix algorithm to sort data in conditions array
+// Returns condition of highest occurance
+function radixSortConditions(array) {
+  // Initialize temp array of conditionsList length
+  // filled with zeros
+  let radix = Array(conditionList.length).fill(0);
+
+  // Fill temp array and increment each corresponding
+  // index from conditionList in radix array
+  for (let i = 0; i < array.length; i++) {
+    let index = conditionList.indexOf(array[i]);
+    radix[index]++;
+  }
+
+  let max = 0;
+  let maxIndex = 0;
+  // Find max value in radix array
+  for (let i = 0; i < radix.length; i++) {
+    if (radix[i] > max) {
+      max = radix[i];
+      maxIndex = i;
+    }
+  }
+
+  return conditionList[maxIndex];
 }
 
 function retrieveSearches() {
@@ -46,14 +110,29 @@ function storeSearches(array) {
 }
 
 function addSearchQuery(array, query) {
+  // Checks if element already exists in history
   // Removes last element from array using .pop() method
   // If user exceeds 5 previous searches
   // Adds new search query using unshift to push to beginning of array
-  if (array.length === 5) {
-    array.pop();
+  if (array.indexOf(query) === -1) {
+    if (array.length === 5) {
+      array.pop();
+    }
+    array.unshift(query);
+    return array;
   }
-  array.unshift(query);
-  return array;
+}
+
+// Displays error message passed into function
+function searchError(message) {
+  citySearch.removeClass("btn-secondary");
+  citySearch.addClass("btn-danger");
+  citySearch.text(message);
+  setTimeout(function () {
+    citySearch.removeClass("btn-danger");
+    citySearch.addClass("btn-secondary");
+    citySearch.text("Search");
+  }, 4000);
 }
 
 function fillSearchHistory(array) {
@@ -79,8 +158,8 @@ function fillSearchHistory(array) {
   }
 }
 
-// Function takes input string searchInput and parses city name,
-// state codes, and country codes
+// Function takes input string searchInput and parses
+// city name, state codes, and country codes
 function parseInput(searchInput) {
   searchInput = searchInput.split(", "); // Split values by comma for API call
 
@@ -90,6 +169,9 @@ function parseInput(searchInput) {
   let country = "";
   let validState = false;
   let validCountry = false;
+  // ADD TWO API CALLS, ONE FOR CURRENT ONE FIVE DAY
+  let currentConditions = "";
+  let fiveDay = "";
 
   console.log(searchInput);
   if (searchInput.length === 3) {
@@ -151,13 +233,40 @@ function parseInput(searchInput) {
   return 'Use "City, State, Country" format';
 }
 
-$(function () {
-  // For testing purposes while OpenWeather
-  // isn't integrated
-  let tempResponse = true;
-  let tempSuccess = 200;
-  let tempFailure = 404;
+// Fills current weather and five day forecast cards
+function fillFiveForecast(data) {
+  // Gets forecast in 3hr intervals for five days
+  let forecastData = data.list;
+  for (let i = 0; i < 5; i++) {
+    // tempAvg to store average temp reading for 3hr intervals
+    // conditionAvg used to return most common condition reading
+    let tempAvg = 0;
+    let conditionAvg = "";
+    let conditionAvgList = [];
+    let dataDate = forecastData[i * 8].dt_txt.split(" ");
+    let currDate = dayjs(dataDate[0]).format("MMM D");
+    // i * 8 - 1 gets indexes for each corresponding day
+    // Day 1 = 0-7, Day 2 = 8-15, and so on
+    for (let j = i * 8; j < i * 8 + 8; j++) {
+      tempAvg += forecastData[j].main.temp;
+      conditionAvgList.push(forecastData[j].weather[0].main);
+    }
 
+    // Calculate average conditions for that day
+    tempAvg = Math.floor(tempAvg / 5);
+    conditionAvg = radixSortConditions(conditionAvgList);
+    let imgCodeIndex = conditionList.indexOf(conditionAvg);
+    let imgCode = conditionIcons[imgCodeIndex];
+    let conditionImg = `http://openweathermap.org/img/w/${imgCode}.png`;
+    // Fill HTML elements with corresponding data
+    $(`#day${i + 1} .card-header`).text(currDate);
+    $(`#day${i + 1} .card-body #temp`).text(tempAvg + "°F");
+    $(`#day${i + 1} .card-body #condition-icon`).attr("src", conditionImg);
+    $(`#day${i + 1} .card-body #condition`).text(conditionAvg);
+  }
+}
+
+$(function () {
   // Try to get localStorage "recent-searches" item
   // If val doesn't exist, create item
   if (!localStorage.getItem("recent-searches")) {
@@ -171,34 +280,41 @@ $(function () {
   // When user searches for city
   citySearch.on("click", function () {
     let cityQuery = $("#get-city").val(); // Get value from search box
-    let apiCoordinates = parseInput(cityQuery);
+    let apiCallFiveDay = parseInput(cityQuery);
 
     // Since all error messages don't begin with
     // an "h", we can check if returned apiCall
     // should be displayed as search or error
-    if (apiCoordinates[0] !== "h") {
-      // Set button to red background and display error
-      citySearch.removeClass("btn-secondary");
-      citySearch.addClass("btn-danger");
-      citySearch.text("");
-      citySearch.text(apiCoordinates);
-      setTimeout(function () {
-        citySearch.removeClass("btn-danger");
-        citySearch.addClass("btn-secondary");
-        citySearch.text("");
-        citySearch.text("Search");
-      }, 4000);
+    if (apiCallFiveDay[0] !== "h") {
+      searchError(apiCallFiveDay);
     } else {
-      fetch(apiCoordinates, { cache: "reload" })
+      fetch(apiCallFiveDay, { cache: "reload" })
         .then(function (response) {
           return response.json();
         })
         .then(function (data) {
+          // Get response code
+          let responseCode = data.cod;
+
+          // Fill in forecast data if 200 response
+          if (responseCode == 200) {
+            fillFiveForecast(data); // Fills five day forecast data
+
+            // Add search query to history if location is validated
+            tempArray = addSearchQuery(tempArray, cityQuery); // Adds saerch query to array
+            fillSearchHistory(tempArray); // Fills in recent searches
+            storeSearches(tempArray); // Stores new data in localStorage
+            // Display error message if 404 response
+          } else if (responseCode == 404) {
+            searchError("Unable to locate city");
+          }
           console.log(data);
         });
-      tempArray = addSearchQuery(tempArray, cityQuery); // Adds saerch query to array
-      fillSearchHistory(tempArray); // Fills in recent searches
-      storeSearches(tempArray); // Stores new data in localStorage
+    }
+
+    // Displays five day forecast if it's hidden
+    if ($("#inactive-display")) {
+      $("#inactive-display").css("display", " ");
     }
   });
 

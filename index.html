@@ -29,7 +29,7 @@
 
   <body>
     <header class="container">
-      <nav class="navbar navbar-dark my-2" style="min-height: 65px">
+      <nav class="navbar navbar-dark mt-4 mx-4" style="min-height: 65px">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">
             <img
@@ -90,42 +90,68 @@
           </div>
         </div>
         <div class="col-9 my-3 display-results">
-          <div class="row current-conditions">
-            <div class="col-9">
+          <div class="row conditions-display">
+            <div class="default-view">No weather information to display!</div>
+            <div id="inactive-display" class="col-9">
               <h1 class="current-city my-2 mx-3">Current City</h1>
+              <p class="current-temperature mx-4">current temp</p>
               <p class="current-humidity mx-4">current humidity</p>
               <p class="current-wind mx-4">current wind speed</p>
-              <p class="current-clouds mx-4">current cloudiness</p>
             </div>
-            <div class="col-3 justify-items-center conditions-view">
+            <div
+              id="inactive-display"
+              class="col-3 justify-items-center conditions-view"
+            >
               <img
                 class="conditions-icon mx-4"
                 src="./assets/images/flaticon-cloudy.png"
                 alt=""
               />
-              <p class="current-temperature mx-4 text-center">current temp</p>
+              <p class="current-conditions mx-4 text-center">
+                current conditions
+              </p>
             </div>
           </div>
-          <div class="row justify-items-center my-3">
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 1 Forecast</h5>
-              <div class="card-body"></div>
+          <div id="inactive-display" class="row justify-items-center my-3">
+            <div id="day1" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body">
+                <p id="temp"></p>
+                <img id="condition-icon" />
+                <p id="condition"></p>
+              </div>
             </div>
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 2 Forecast</h5>
-              <div class="card-body"></div>
+            <div id="day2" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body">
+                <p id="temp"></p>
+                <img id="condition-icon" />
+                <p id="condition"></p>
+              </div>
             </div>
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 3 Forecast</h5>
-              <div class="card-body"></div>
+            <div id="day3" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body">
+                <p id="temp"></p>
+                <img id="condition-icon" />
+                <p id="condition"></p>
+              </div>
             </div>
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 4 Forecast</h5>
-              <div class="card-body"></div>
+            <div id="day4" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body">
+                <p id="temp"></p>
+                <img id="condition-icon" style="width: 80px; height: 80px" />
+                <p id="condition"></p>
+              </div>
             </div>
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 5 Forecast</h5>
-              <div class="card-body"></div>
+            <div id="day5" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body">
+                <p id="temp"></p>
+                <img id="condition-icon" />
+                <p id="condition"></p>
+              </div>
             </div>
           </div>
         </div>
@@ -136,6 +162,12 @@
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <!--DayJS CDN-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/dayjs@1.11.3/dayjs.min.js"
+      integrity="sha256-iu/zLUB+QgISXBLCW/mcDi/rnf4m4uEDO0wauy76x7U="
       crossorigin="anonymous"
     ></script>
     <script type="module" src="./assets/js/script.js"></script>
