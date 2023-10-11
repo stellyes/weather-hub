@@ -376,7 +376,70 @@ function fillFiveForecast(data) {
   }
 }
 
-function handleSearch(query) {}
+function handleSearch(query) {
+  let apiCallFiveDay = parseInputFiveDay(query);
+  let tempArray = retrieveSearches();
+
+  // Since all error messages don't begin with
+  // an "h", we can check if returned apiCall
+  // should be displayed as search or error
+  if (apiCallFiveDay[0] !== "h") {
+    searchError(apiCallFiveDay);
+  } else {
+    fetch(apiCallFiveDay, { cache: "reload" })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        // Get response code
+        var responseCodeFiveDay = data.cod;
+
+        // Fill in forecast data if 200 response
+        if (responseCodeFiveDay == 200) {
+          fillFiveForecast(data); // Fills five day forecast data
+
+          // Display error message if 404 response
+        } else if (responseCodeFiveDay == 404) {
+          searchError("Unable to locate city");
+        }
+
+        return data.city.id;
+      })
+      .then(function (data) {
+        // make API call for current conditions
+        let apiCallCurrent = `https://api.openweathermap.org/data/2.5/weather?id=${data}&units=${units}&appid=${apikey}`;
+
+        fetch(apiCallCurrent, { cache: "reload" })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (innerData) {
+            var responseCodeCurrent = innerData.cod;
+
+            if (responseCodeCurrent === 200) {
+              fillCurrentForecast(innerData);
+            } else if (responseCodeCurrent == 404) {
+              searchError("Invalid City ID");
+              return;
+            }
+          });
+
+        // If both API calls were succesful, render search to history
+        // Add search query to history if location is validated
+        tempArray = addSearchQuery(tempArray, query); // Adds saerch query to array
+        fillSearchHistory(tempArray); // Fills in recent searches
+        storeSearches(tempArray); // Stores new data in localStorage
+
+        // Displays forecast if it's hidden
+        if ($("#inactive-display")) {
+          displayDefault.css("display", "none");
+          $("#inactive-conditions").removeClass("inactive");
+          $("#inactive-weather-img").removeClass("inactive");
+          $("#inactive-five-day").removeClass("inactive");
+        }
+      });
+  }
+}
 
 $(function () {
   // Try to get localStorage "recent-searches" item
@@ -389,71 +452,16 @@ $(function () {
   let tempArray = retrieveSearches();
   fillSearchHistory(tempArray);
 
+  // Gets for weather of search history item
+  searchItem.on("click", function () {
+    let query = $(this).text();
+    handleSearch(query);
+  });
+
   // When user searches for city
   citySearch.on("click", function () {
     let cityQuery = $("#get-city").val(); // Get value from search box
-    let apiCallFiveDay = parseInputFiveDay(cityQuery);
-    var callFlag = [false, false]; // Boolean Flags
-
-    // Since all error messages don't begin with
-    // an "h", we can check if returned apiCall
-    // should be displayed as search or error
-    if (apiCallFiveDay[0] !== "h") {
-      searchError(apiCallFiveDay);
-    } else {
-      fetch(apiCallFiveDay, { cache: "reload" })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          // Get response code
-          var responseCodeFiveDay = data.cod;
-
-          // Fill in forecast data if 200 response
-          if (responseCodeFiveDay == 200) {
-            fillFiveForecast(data); // Fills five day forecast data
-
-            // Display error message if 404 response
-          } else if (responseCodeFiveDay == 404) {
-            searchError("Unable to locate city");
-          }
-
-          return data.city.id;
-        })
-        .then(function (data) {
-          // make API call for current conditions
-          let apiCallCurrent = `https://api.openweathermap.org/data/2.5/weather?id=${data}&units=${units}&appid=${apikey}`;
-
-          fetch(apiCallCurrent, { cache: "reload" })
-            .then(function (response) {
-              return response.json();
-            })
-            .then(function (innerData) {
-              var responseCodeCurrent = innerData.cod;
-
-              if (responseCodeCurrent === 200) {
-                fillCurrentForecast(innerData);
-              } else if (responseCodeCurrent == 404) {
-                searchError("Unable to locate city");
-                return;
-              }
-            });
-
-          // If both API calls were succesful, render search to history
-          // Add search query to history if location is validated
-          tempArray = addSearchQuery(tempArray, cityQuery); // Adds saerch query to array
-          fillSearchHistory(tempArray); // Fills in recent searches
-          storeSearches(tempArray); // Stores new data in localStorage
-
-          // Displays forecast if it's hidden
-          if ($("#inactive-display")) {
-            displayDefault.css("display", "none");
-            $("#inactive-conditions").removeClass("inactive");
-            $("#inactive-weather-img").removeClass("inactive");
-            $("#inactive-five-day").removeClass("inactive");
-          }
-        });
-    }
+    handleSearch(cityQuery);
   });
 
   unitSwitch.on("click", function () {
@@ -468,11 +476,5 @@ $(function () {
       convertUnits();
       units = "metric";
     }
-  });
-
-  // Isn't registering clicks?
-  $(".previous-search").on("click", function (event) {
-    let query = $(this).find("button").text();
-    // SEND QUERY TO SEARCH BOX, MAKE API CALL
   });
 });

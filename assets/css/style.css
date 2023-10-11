@@ -41,10 +41,6 @@ nav {
   border-radius: 20px;
 }
 
-.previous-search {
-  z-index: 1;
-}
-
 #invalid-input {
   display: none;
   font-size: x-small;
@@ -75,6 +71,10 @@ nav {
   border: 1px solid #00000000;
   box-shadow: 4px 4px 8px #0e53c9;
   border-radius: 10px;
+}
+
+.search-item {
+  z-index: 2;
 }
 
 #wind,
