@@ -27,33 +27,76 @@ nav {
   border-radius: 20px;
 }
 
+#btn-search {
+  font-size: small;
+}
+
+.current-conditions {
+  font-style: italic;
+}
+
 .search-history {
   list-style: none;
   background-color: rgba(204, 231, 255, 0.4);
+  border-radius: 20px;
+}
+
+#invalid-input {
+  display: none;
+  font-size: x-small;
 }
 
 .navbar-brand {
   letter-spacing: 0.1rem;
 }
 
-.current-conditions {
+.conditions-display {
   background-color: #cce7ff;
   border: 1px solid rgba(0, 0, 0, 0);
   border-radius: 20px;
   box-shadow: 0px 0px 10px #0e53c9;
 }
 
-.conditions-view {
-  background-color: radial-gradient(to top, #1786ee 4%, #cce7ff 60%);
-}
-
 .conditions-icon {
   width: 75%;
 }
 
+.inactive {
+  display: none;
+}
+
+.card {
+  color: #083177;
+  background-color: #eeddce;
+  border: 1px solid #00000000;
+  box-shadow: 4px 4px 8px #0e53c9;
+  border-radius: 10px;
+}
+
+.search-item {
+  z-index: 2;
+}
+
+#wind,
+#humidity,
+#temp {
+  font-size: 14px;
+}
+
+#condition-icon {
+  width: 80px;
+  height: 80px;
+}
+
+.default-view {
+  font-style: italic;
+  font-size: x-large;
+  min-height: 100%;
+  margin: 25%;
+}
+
 #credits {
   font-size: x-small;
-
   color: #083177;
 }
 

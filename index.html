@@ -19,16 +19,23 @@
     />
     <link rel="stylesheet" href="./assets/css/style.css" />
     <title>Weather Hub!</title>
+    <!--jQuery CDN-->
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.js"
+      integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+      crossorigin="anonymous"
+    ></script>
   </head>
 
   <body>
     <header class="container">
-      <nav class="navbar navbar-dark my-2" style="min-height: 65px">
+      <nav class="navbar navbar-dark mt-4 mx-4" style="min-height: 65px">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">
             <img
               src="./assets/images/flaticon-cloudy.png"
-              alt=""
+              alt="A sun hidden behind a cloud"
+              title="Image provided by flaticon.com"
               width="24"
               height="24"
               class="d-inline-block align-text-top"
@@ -43,61 +50,117 @@
       <div class="row">
         <div class="col-3 search-sidebar">
           <div class="my-3 p-3 search-query">
-            <label for="getCity" class="form-label">Get weather reading:</label>
+            <label for="get-city" class="form-label"
+              >Get weather reading:</label
+            >
             <input
               type="text"
               class="form-control"
-              id="getCity"
+              id="get-city"
               placeholder="Enter city here"
               required
             />
+            <button
+              type="button"
+              id="btn-search"
+              class="btn btn-secondary btn-sm btn-block mt-2"
+              style="width: 100%"
+            >
+              Search
+            </button>
           </div>
-          <ul class="my-3 py-3 px-1 text-center search-history">
-            <li class="my-2 py-2">Where search history is gna go!</li>
-            <li class="my-2 py-2">Each list item is</li>
-            <li class="my-2 py-2">going to be dynamically</li>
-            <li class="my-2 py-2">generated so that</li>
-            <li class="my-2 py-2">history doesn't repeat</li>
-            <li class="my-2 py-2">itself! lol</li>
+          <ul
+            class="my-3 py-3 px-1 text-center search-history"
+            style="min-height: 10rem"
+          >
+            <div class="no-history mt-4 pt-3">
+              Make a search and it'll appear here!
+            </div>
           </ul>
+          <div id="units-display" class="my-3 mx-2 unit-form-check form-switch">
+            <input
+              class="mx-2 form-check-input"
+              type="checkbox"
+              id="unit-switch"
+            />
+            <label
+              id="units"
+              data-units="imperial"
+              class="mx-2 form-check-label"
+              for="unit-switch"
+              >Imperial Units</label
+            >
+          </div>
         </div>
         <div class="col-9 my-3 display-results">
-          <div class="row current-conditions">
-            <div class="col-9">
-              <h1 class="current-city my-2 mx-3">Current City</h1>
+          <div class="row conditions-display">
+            <div class="default-view">No weather information to display!</div>
+            <div id="inactive-conditions" class="col-9 inactive">
+              <h1 class="current-city my-2 mx-4">Current City</h1>
+              <p class="current-temperature mx-4">current temp</p>
               <p class="current-humidity mx-4">current humidity</p>
               <p class="current-wind mx-4">current wind speed</p>
-              <p class="current-air mx-4">current air quality</p>
             </div>
-            <div class="col-3 justify-items-center conditions-view">
-              <img
-                class="conditions-icon mx-4"
-                src="./assets/images/flaticon-cloudy.png"
-                alt=""
-              />
-              <p class="current-temperature mx-4 text-center">current temp</p>
+            <div class="inactive col-3 justify-items-center conditions-view">
+              <img class="conditions-icon mx-4" src="" alt="" />
+              <p class="current-conditions mx-4 text-center">
+                current conditions
+              </p>
             </div>
           </div>
-          <div class="row justify-items-center my-3">
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 1 Forecast</h5>
-              <div class="card-body"></div>
+          <div
+            id="inactive-five-day"
+            class="inactive row justify-items-center my-3"
+          >
+            <div id="day1" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body">
+                <p id="temp" class="my-0"></p>
+                <p id="humidity" class="my-0"></p>
+                <p id="wind" class="my-0"></p>
+                <img id="condition-icon" class="my-1" />
+                <p id="condition" class="my-0"></p>
+              </div>
             </div>
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 2 Forecast</h5>
-              <div class="card-body"></div>
+            <div id="day2" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body">
+                <p id="temp" class="my-0"></p>
+                <p id="humidity" class="my-0"></p>
+                <p id="wind" class="my-0"></p>
+                <img id="condition-icon" class="my-1" />
+                <p id="condition" class="my-0"></p>
+              </div>
             </div>
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 3 Forecast</h5>
-              <div class="card-body"></div>
+            <div id="day3" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body">
+                <p id="temp" class="my-0"></p>
+                <p id="humidity" class="my-0"></p>
+                <p id="wind" class="my-0"></p>
+                <img id="condition-icon" class="my-1" />
+                <p id="condition" class="my-0"></p>
+              </div>
             </div>
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 4 Forecast</h5>
-              <div class="card-body"></div>
+            <div id="day4" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body">
+                <p id="temp" class="my-0"></p>
+                <p id="humidity" class="my-0"></p>
+                <p id="wind" class="my-0"></p>
+                <img id="condition-icon" class="my-1" />
+                <p id="condition" class="my-0"></p>
+              </div>
             </div>
-            <div class="col card mx-1">
-              <h5 class="card-header">Day 5 Forecast</h5>
-              <div class="card-body"></div>
+            <div id="day5" class="col card mx-1 text-center">
+              <h4 class="card-header"></h4>
+              <div class="card-body mx-0">
+                <p id="temp" class="my-0"></p>
+                <p id="humidity" class="my-0"></p>
+                <p id="wind" class="my-0"></p>
+                <img id="condition-icon" class="my-1" />
+                <p id="condition" class="my-0"></p>
+              </div>
             </div>
           </div>
         </div>
@@ -110,5 +173,12 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
+    <!--DayJS CDN-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/dayjs@1.11.3/dayjs.min.js"
+      integrity="sha256-iu/zLUB+QgISXBLCW/mcDi/rnf4m4uEDO0wauy76x7U="
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="./assets/js/script.js"></script>
   </body>
 </html>
