@@ -274,8 +274,8 @@ function parseInputFiveDay(searchInput) {
       return "Invalid input for country";
     }
 
-    // If input is validated, return HTTP API call url
-    return `http://api.openweathermap.org/data/2.5/forecast?q=${city},${state},${country}&units=${units}&appid=${apikey}`;
+    // If input is validated, return https API call url
+    return `https://api.openweathermap.org/data/2.5/forecast?q=${city},${state},${country}&units=${units}&appid=${apikey}`;
   } else if (searchInput.length === 2) {
     // Same functionality as prior conditional response
     // with one less parameter
@@ -292,10 +292,10 @@ function parseInputFiveDay(searchInput) {
       return "Invalid input for country";
     }
 
-    return `http://api.openweathermap.org/data/2.5/forecast?q=${city},${country}&units=${units}&appid=${apikey}`;
+    return `https://api.openweathermap.org/data/2.5/forecast?q=${city},${country}&units=${units}&appid=${apikey}`;
   } else if (searchInput.length === 1) {
     // One parameter API calls require no input validation
-    return `http://api.openweathermap.org/data/2.5/forecast?q=${searchInput[0]}&units=${units}&appid=${apikey}`;
+    return `https://api.openweathermap.org/data/2.5/forecast?q=${searchInput[0]}&units=${units}&appid=${apikey}`;
   }
   // Return instructional error message if input parameters
   // exceed three
@@ -320,7 +320,7 @@ function fillCurrentForecast(data) {
   displayConditions.text(`${description}`);
   displayIcon.attr(
     "src",
-    `http://openweathermap.org/img/w/${data.weather[0].icon}.png`
+    `https://openweathermap.org/img/w/${data.weather[0].icon}.png`
   );
   conditionsSidebar.removeClass("inactive");
 }
@@ -356,7 +356,7 @@ function fillFiveForecast(data) {
     conditionAvg = radixSortConditions(conditionAvgList);
     let imgCodeIndex = conditionList.indexOf(conditionAvg);
     let imgCode = conditionIcons[imgCodeIndex];
-    let conditionImg = `http://openweathermap.org/img/w/${imgCode}.png`;
+    let conditionImg = `https://openweathermap.org/img/w/${imgCode}.png`;
     // Fill HTML elements with corresponding data
     $(`#day${i + 1} .card-header`).text(currDate);
     if (units == "imperial") {
